@@ -2,8 +2,7 @@
 
 Welcome to the home of the [Infra(Productivity) working
 group](https://github.com/knative/community/blob/main/working-groups/WORKING-GROUPS.md#productivity)!
-This repo contains the configurations for the Knative infrastructure and
-is the starting point to the many other repos we maintain, see the list
+This repo contains the configurations for the Knative infrastructure and is the starting point to the many other repos we maintain, see the list
 below. You can find us on the [Knative slack
 \#productivity](https://slack.knative.dev/messages/productivity)
 channel.
@@ -12,8 +11,7 @@ channel.
 
 ### Github Actions
 
-We use github actions for some automated tests, coordinating releases
-and syncronizing files between repos. For general information about
+We use github actions for some automated tests, coordinating releases and syncronizing files between repos. For general information about
 github actions see github's [documentaion for
 actions](https://docs.github.com/en/actions).
 
