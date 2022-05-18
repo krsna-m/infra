@@ -4,13 +4,12 @@ Prow is the tool we use that triggers jobs based on events and mangages validati
 
 ## Summary of current directory
 
-Within each directory there will be a `README.md` that will go in to more details. Below is a summary:
+Within each directory there will be a `README.md` that will go in to more details. Below is a summary of this directory:
 
-- `cluster-definitions` are the collection of deployment definitions for the different kubernetes clusters that are used by Prow.
-- `config` configurations for the different components of Prow.
+- `admin` contains files for admins of Prow.
+- `config` configuration for Prow and it's plugins.
 - `job-definitions` job definitions used by our slightly customized version of [prowgen](https://github.com/istio/test-infra/tree/master/tools/prowgen) config generation tool.
-- `jobs` are the actual job yaml that is either generated or hand-written that are used by Prow.
-- `Makefile` is an entry point to provide the initial deployment of the clusters explained in the cluster-definitions directory.
+- `jobs` are the actual job yaml that is either generated or hand-written that are used by Prow
 
 ## Overview of Prow componets we use
 
@@ -28,7 +27,7 @@ We use the merge automation and all the core components outlined in the [kuberne
 ### Hook and it's plugins
 
 [Hook](https://github.com/kubernetes/test-infra/blob/master/prow/cmd/hook) is the most important piece. It is a stateless server that listens for GitHub webhooks and dispatches them to the appropriate plugins. Hook's plugins are used to trigger jobs, implement 'slash' commands, post to Slack, and more. See the [prow/plugins](https://github.com/kubernetes/test-infra/blob/master/prow/plugins) directory for more information on plugins.
-The plugins we use can be found in the [hook-plugins.yaml](config/hook-plugins.yaml) file.
+The plugins we use can be found in the [config/plugins.yaml](config/plugins.yaml) file.
 
 ## Simple Prow example
 
