@@ -22,6 +22,7 @@ jobs:
     needs: [markdown-files]
     if: needs.markdown-files.outputs.matched == 'true'
     steps:
+      - uses: actions/checkout@v3
       - uses: PurpleBooth/gfmfmt-action@v2.0.7
         with:
           check: false
