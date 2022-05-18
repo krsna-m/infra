@@ -1,0 +1,28 @@
+on: [pull_request]
+
+jobs:
+  markdown-files:
+    id: matched
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+    
+    - id: files
+      uses: tj-actions/changed-files@v20
+      with:
+        files: |
+            *.md
+            *.MD
+            **/*.md
+            **/*.MD
+    
+  markdown:
+    if: jobs.matched.steps.files.outputs.any_changed == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: PurpleBooth/gfmfmt-action@v2.0.7
+        with:
+          check: false
+      - uses: reviewdog/action-suggester@v1
+        with:
+          tool_name: gfmfmt
