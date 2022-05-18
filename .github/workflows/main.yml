@@ -4,7 +4,7 @@ jobs:
     name: runner / suggester / gofmt
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - run: gofmt -w -s .
       - uses: reviewdog/action-suggester@v1
         with:
@@ -13,11 +13,12 @@ jobs:
     name: runner / suggester / shell
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
-      - uses: actions/setup-go@v3.1.0
-      - run: go install mvdan.cc/sh/v3/cmd/shfmt@latest
-
-      - run: shfmt -i 2 -ci -w .
+      - uses: actions/checkout@v3
+      - uses: actions/setup-go@v3
+      - run: |
+          yamls=$(find . -name "*.yaml")
+          echo "::set-output name=files::${yamls}"
+      - run: go run mvdan.cc/sh/v3/cmd/shfmt@latest -i 2 -ci -w .
       - name: suggester / shfmt
         uses: reviewdog/action-suggester@v1
         with:
