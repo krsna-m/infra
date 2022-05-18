@@ -1,14 +1,28 @@
-on: [push, pull_request]
+on: [pull_request]
 
 jobs:
-  lint-markdown:
+  markdown-files:
+    id: matched
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v2
-    - uses: PurpleBooth/gfmfmt-action@v2.0.7
+    - uses: actions/checkout@v3
+    
+    - id: files
+      uses: tj-actions/changed-files@v20
       with:
-        check: false
-    - run: git config user.email "automation@knative.team"
-    - run: git config user.name "Markdown linting bot"
-    - run: git commit -am "Fix markdown formatting."
-    - run: git push
+        files: |
+            *.md
+            *.MD
+            **/*.md
+            **/*.MD
+    
+  markdown:
+    if: jobs.matched.steps.files.outputs.any_changed == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: PurpleBooth/gfmfmt-action@v2.0.7
+        with:
+          check: false
+      - uses: reviewdog/action-suggester@v1
+        with:
+          tool_name: gfmfmt
