@@ -1,6 +1,27 @@
 on: [pull_request] # Support only pull_request event.
 jobs:
+  # JOB to run change detection
+  changes:
+    runs-on: ubuntu-latest
+    # Set job outputs to values from filter step
+    outputs:
+      golang: ${{ steps.filter.outputs.golang }}
+      shell: ${{ steps.filter.outputs.shell }}
+    steps:
+    # For pull requests it's not necessary to checkout the code
+    - uses: dorny/paths-filter@v2
+      id: filter
+      with:
+        filters: |
+          golang:
+            - '**.go'
+          shell:
+            - '**.sh'
+            
+  # JOB to run for golang
   go:
+    needs: changes
+    if: ${{ needs.changes.outputs.golang == 'true' }}
     name: runner / suggester / gofmt
     runs-on: ubuntu-latest
     steps:
@@ -9,7 +30,11 @@ jobs:
       - uses: reviewdog/action-suggester@v1
         with:
           tool_name: gofmt
+  
+  # JOB to run for shell
   shell:
+    needs: changes
+    if: ${{ needs.changes.outputs.shell == 'true' }}
     name: runner / suggester / shell
     runs-on: ubuntu-latest
     steps:
