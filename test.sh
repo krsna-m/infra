@@ -1,3 +1,3 @@
 #!/bin/bash
-log="234%5"
+log="2345"
 echo $log 
