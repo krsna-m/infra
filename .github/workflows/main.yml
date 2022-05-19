@@ -44,23 +44,17 @@ jobs:
       - id: shellcheck_suggester
         run: |
           stderr=$(for sh_file in ${{ needs.changes.outputs.shell_files }}; do shellcheck -f diff $sh_file | patch -p1; done 2>&1 > /dev/null)
-          if [[ $stderr == "Issues were detected"* ]]; then exit 1; fi
-        continue-on-error: true
+          if [[ $stderr == "Issues were detected"* ]]; then
+            echo "::set-output name=result::fail"
+            echo "::warning ::Issues were detected and cannot be auto-fixed!"
+          fi
       - name: suggester / shellcheck
         uses: reviewdog/action-suggester@v1
         with:
           tool_name: shellcheck
-#       - uses: actions/github-script@v6
-#         with:
-#           script: |
-#             github.rest.issues.createComment({
-#               issue_number: context.issue.number,
-#               owner: context.repo.owner,
-#               repo: context.repo.repo,
-#               body: '👋 Thanks for reporting!'
-#             })
+      
       - name: Run ShellCheck
-        if: steps.shellcheck_suggester.outcome != 'sucess' 
+        if: steps.shellcheck_suggester.result == 'fail' 
         uses: lumaxis/shellcheck-problem-matchers@v1
-      - if: steps.shellcheck_suggester.outcome != 'sucess' 
+      - if: steps.shellcheck_suggester.result == 'fail' 
         run: shellcheck -f gcc ${{ needs.changes.outputs.shell_files }}
