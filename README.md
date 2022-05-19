@@ -12,8 +12,7 @@ channel.
 ### Github Actions
 
 We use github actions for some automated tests, coordinating releases
-and syncronizing files between repos. For general information about
-github actions see github's [documentaion for
+and syncronizing files between repos. For general information about github actions see github's [documentaion for
 actions](https://docs.github.com/en/actions).
 
 ### TestGrid
