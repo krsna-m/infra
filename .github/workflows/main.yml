@@ -41,9 +41,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      - run: |
+      - id: shellcheck_suggester
+        run: |
           stderr=$(for sh_file in ${{ needs.changes.outputs.shell_files }}; do shellcheck -f diff $sh_file | patch -p1; done 2>&1 > /dev/null)
           if [[ $stderr == "Issues were detected"* ]]; then exit 1; fi
+        continue-on-error: true
       - name: suggester / shellcheck
         uses: reviewdog/action-suggester@v1
         with:
@@ -58,4 +60,5 @@ jobs:
 #               body: '👋 Thanks for reporting!'
 #             })
       - name: Run ShellCheck
+        if: steps.shellcheck_suggester.outcome != 'sucess' 
         uses: ludeeus/action-shellcheck@master
