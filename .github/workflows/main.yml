@@ -7,11 +7,13 @@ jobs:
     outputs:
       golang: ${{ steps.filter.outputs.golang }}
       shell: ${{ steps.filter.outputs.shell }}
+      shell_files: ${{ steps.filter.outputs.shell_files }}
     steps:
     # For pull requests it's not necessary to checkout the code
     - uses: dorny/paths-filter@v2
       id: filter
       with:
+        list-files: 'shell'
         filters: |
           golang:
             - '**.go'
@@ -39,8 +41,18 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      - run: shellcheck -f diff **/*.sh | patch -p1
+      - run: shellcheck -f diff ${{ needs.changes.outputs.shell_files }} | patch -p1
       - name: suggester / shellcheck
         uses: reviewdog/action-suggester@v1
         with:
           tool_name: shellcheck
+      - uses: actions/github-script@v6
+        with:
+          script: |
+            console.log(context)
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: '👋 Thanks for reporting!'
+            })
