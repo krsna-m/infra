@@ -8,6 +8,7 @@ jobs:
       golang: ${{ steps.filter.outputs.golang }}
       shell: ${{ steps.filter.outputs.shell }}
       shell_files: ${{ steps.filter.outputs.shell_files }}
+      markdown: ${{ steps.filter.outputs.markdown }}
     steps:
     # For pull requests it's not necessary to checkout the code
     - uses: dorny/paths-filter@v2
