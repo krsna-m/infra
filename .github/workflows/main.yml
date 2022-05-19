@@ -61,4 +61,4 @@ jobs:
 #             })
       - name: Run ShellCheck
         if: steps.shellcheck_suggester.outcome != 'sucess' 
-        uses: ludeeus/action-shellcheck@master
+        uses: reviewdog/action-shellcheck@v1
