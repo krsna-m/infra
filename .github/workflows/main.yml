@@ -63,4 +63,4 @@ jobs:
         if: steps.shellcheck_suggester.outcome != 'sucess' 
         uses: reviewdog/action-shellcheck@v1
         with:
-          level: 'warning'
+          level: "info"
