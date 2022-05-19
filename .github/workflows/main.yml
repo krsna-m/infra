@@ -21,7 +21,7 @@ jobs:
             - '**.sh'
           markdown:
             - '**.md'
-              '**.MD'
+            - '**.MD'
             
   # JOB to run for golang
   go:
