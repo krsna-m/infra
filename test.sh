@@ -1,4 +1,3 @@
-#/bin/bash
-log="2345"
+#!/bin/bash
 echo $log 
 yes
