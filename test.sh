@@ -1,3 +1,3 @@
 log="234%"
-echo $log f
+echo $log ff
 echo $log fff
