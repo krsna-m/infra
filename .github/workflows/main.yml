@@ -48,6 +48,7 @@ jobs:
             for sh_file in ${{ needs.changes.outputs.shell_files }}; do
               shellcheck -f diff $sh_file | patch -p1
             done
+        continue-on-error: true
       - if: ${{ steps.shellcheck_suggester.outputs.stderr }}
         run: echo "::warning ::Issues were detected and cannot be auto-fixed!"
       - name: suggester / shellcheck
