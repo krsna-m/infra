@@ -3,8 +3,7 @@
 Welcome to the home of the [Infra(Productivity) working
 group](https://github.com/knative/community/blob/main/working-groups/WORKING-GROUPS.md#productivity)!
 This repo contains the configurations for the Knative infrastructure and
-is the starting point to the many other repos we maintain, see the list
-below. You can find us on the [Knative slack
+is the starting point to the many other repos we maintain, see the list below. You can find us on the [Knative slack
 \#productivity](https://slack.knative.dev/messages/productivity)
 channel.
 
