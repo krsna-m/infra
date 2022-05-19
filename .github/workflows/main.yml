@@ -42,19 +42,21 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - id: shellcheck_suggester
-        run: |
-          stderr=$(for sh_file in ${{ needs.changes.outputs.shell_files }}; do shellcheck -f diff $sh_file | patch -p1; done 2>&1 > /dev/null)
-          if [[ $stderr == "Issues were detected"* ]]; then
-            echo "::set-output name=result::'fail'"
-            echo "::warning ::Issues were detected and cannot be auto-fixed!"
-          fi
+        uses: mathiasvr/command-output@v1
+        with:
+          run: |
+            for sh_file in ${{ needs.changes.outputs.shell_files }}; do
+              shellcheck -f diff $sh_file | patch -p1
+            done
+      - if: ${{ steps.shellcheck_suggester.outputs.stderr }}
+        run: echo "::warning ::Issues were detected and cannot be auto-fixed!"
       - name: suggester / shellcheck
         uses: reviewdog/action-suggester@v1
         with:
           tool_name: shellcheck
       
       - name: Run ShellCheck
-        if: steps.shellcheck_suggester.result == 'fail' 
+        if: ${{ steps.shellcheck_suggester.outputs.stderr }}
         uses: lumaxis/shellcheck-problem-matchers@v1
-      - if: steps.shellcheck_suggester.result == 'fail' 
+      - if: ${{ steps.shellcheck_suggester.outputs.stderr }}
         run: shellcheck -f gcc ${{ needs.changes.outputs.shell_files }}
