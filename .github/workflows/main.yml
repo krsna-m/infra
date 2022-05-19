@@ -66,8 +66,9 @@ jobs:
   # JOB to run for markdown
   markdown:
     needs: changes
-    runs-on: ubuntu-latest
     if: ${{ needs.changes.outputs.markdown == 'true' }}
+    name: runner / suggester / markdown
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
       - uses: PurpleBooth/gfmfmt-action@v2.0.7
