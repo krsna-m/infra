@@ -45,7 +45,7 @@ jobs:
         run: |
           stderr=$(for sh_file in ${{ needs.changes.outputs.shell_files }}; do shellcheck -f diff $sh_file | patch -p1; done 2>&1 > /dev/null)
           if [[ $stderr == "Issues were detected"* ]]; then
-            echo "::set-output name=result::fail"
+            echo "::set-output name=result::'fail'"
             echo "::warning ::Issues were detected and cannot be auto-fixed!"
           fi
       - name: suggester / shellcheck
