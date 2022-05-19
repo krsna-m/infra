@@ -19,6 +19,9 @@ jobs:
             - '**.go'
           shell:
             - '**.sh'
+          markdown:
+            - '**.md'
+              '**.MD'
             
   # JOB to run for golang
   go:
@@ -49,8 +52,6 @@ jobs:
               shellcheck -f diff $sh_file | patch -p1
             done
         continue-on-error: true
-      - if: ${{ steps.shellcheck_suggester.outputs.stderr }}
-        run: echo "::warning ::Issues were detected and cannot be auto-fixed!"
       - name: suggester / shellcheck
         uses: reviewdog/action-suggester@v1
         with:
@@ -61,3 +62,17 @@ jobs:
         uses: lumaxis/shellcheck-problem-matchers@v1
       - if: ${{ steps.shellcheck_suggester.outputs.stderr }}
         run: shellcheck -f gcc ${{ needs.changes.outputs.shell_files }}
+     
+  # JOB to run for markdown
+  markdown:
+    needs: changes
+    runs-on: ubuntu-latest
+    if: ${{ needs.changes.outputs.markdown == 'true' }}
+    steps:
+      - uses: actions/checkout@v3
+      - uses: PurpleBooth/gfmfmt-action@v2.0.7
+        with:
+          check: false
+      - uses: reviewdog/action-suggester@v1
+        with:
+          tool_name: gfmfmt
