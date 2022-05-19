@@ -1,3 +1,3 @@
 #!/bin/bash
-echo "$log" 
+echo $log
 yes
