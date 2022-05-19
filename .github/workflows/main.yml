@@ -61,6 +61,6 @@ jobs:
 #             })
       - name: Run ShellCheck
         if: steps.shellcheck_suggester.outcome != 'sucess' 
-        uses: reviewdog/action-shellcheck@v1
-        with:
-          level: "info"
+        uses: lumaxis/shellcheck-problem-matchers@v1
+      - if: steps.shellcheck_suggester.outcome != 'sucess' 
+        run: shellcheck -f gcc ${{ needs.changes.outputs.shell_files }}
