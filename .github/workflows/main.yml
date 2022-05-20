@@ -101,13 +101,14 @@ jobs:
         with:
           tools: 'yamlfixer-opt-nc'
           cache: yes
-      - run: yamlfixer ${{ needs.changes.outputs.yaml_files }}
+      - run: yamlfixer -D "{extends: relaxed, rules: {truthy: disable, line-length: {max: 120}}}" ${{ needs.changes.outputs.yaml_files }}
+        continue-on-error: true
       - uses: reviewdog/action-suggester@v1
         with:
           tool_name: yamlfixer
           
       - uses: pr-annotators/yamllint-pr-annotator@v1.0.0
-      - run: yamllint -f parsable ${{ needs.changes.outputs.yaml_files }}
+      - run: yamllint -d "{extends: relaxed, rules: {truthy: disable, line-length: {max: 120}}}" -f parsable ${{ needs.changes.outputs.yaml_files }}
       
   # JOB to run for gha-yaml
   gha-yaml:
