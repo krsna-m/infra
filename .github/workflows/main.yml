@@ -46,6 +46,7 @@ jobs:
       - uses: reviewdog/action-suggester@v1
         with:
           tool_name: gofmt
+          filter_mode: 'file'
   
   # JOB to run for shell
   shell:
@@ -67,6 +68,11 @@ jobs:
         uses: reviewdog/action-suggester@v1
         with:
           tool_name: shellcheck
+          filter_mode: 'file'
+          
+      - uses: reviewdog/action-shfmt@v1
+        with:
+          filter_mode: 'file'
       
       - name: Run ShellCheck
         if: ${{ steps.shellcheck_suggester.outputs.stderr }}
@@ -88,6 +94,7 @@ jobs:
       - uses: reviewdog/action-suggester@v1
         with:
           tool_name: gfmfmt
+          filter_mode: 'file'
           
   # JOB to run for yaml
   yaml:
@@ -106,6 +113,7 @@ jobs:
       - uses: reviewdog/action-suggester@v1
         with:
           tool_name: yamlfixer
+          filter_mode: 'file'
           
       - uses: pr-annotators/yamllint-pr-annotator@v1.0.0
       - run: yamllint -f parsable ${{ needs.changes.outputs.yaml_files }}
@@ -121,3 +129,4 @@ jobs:
       - uses: reviewdog/action-actionlint@v1
         with:
           actionlint_flags: ${{ needs.changes.outputs.gha-yaml_files }}
+          filter_mode: 'file'
