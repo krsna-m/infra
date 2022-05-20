@@ -18,6 +18,7 @@ jobs:
       - uses: actions/cache@v3
         with:
           path: ~/.npm
+          # yamllint disable-line rule:line-length
           key: ${{ matrix.platform }}-node-${{ hashFiles('**/package-lock.json') }}
         if: ${{ github.repository.permissions.admin == true }}
       - run: npm install && npm test
