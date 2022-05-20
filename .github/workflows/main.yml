@@ -118,6 +118,4 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      - name: Setup Golang with cache
-        uses: magnetikonline/action-golang-cache@v2
-      - run: go run github.com/rhysd/actionlint/cmd/actionlint@latest ${{ needs.changes.outputs.gha-yaml_files }}
+      - uses: reviewdog/action-actionlint@v1
