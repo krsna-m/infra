@@ -78,7 +78,6 @@ jobs:
         if: ${{ steps.shellcheck_suggester.outputs.stderr }}
         uses: reviewdog/action-shellcheck@v1
         with:
-          shellcheck_flags: "-x ${{ needs.changes.outputs.shell_files }}"
           filter_mode: 'file'
      
   # JOB to run for markdown
