@@ -1,25 +1,121 @@
----
-on:
-  push:
-    branch: main
-    tags:
-      - 'v\d+'
+on: [pull_request] # Support only pull_request event.
 jobs:
-  test:
-    strategy:
-      matrix:
-        os: [macos-latest, linux-latest]
-    runs-on: ${{ matrix.os }}
+  # JOB to run change detection
+  changes:
+    runs-on: ubuntu-latest
+    # Set job outputs to values from filter step
+    outputs:
+      golang: ${{ steps.matched.outputs.golang }}
+      shell: ${{ steps.matched.outputs.shell }}
+      shell_files: ${{ steps.matched.outputs.shell_files }}
+      markdown: ${{ steps.matched.outputs.markdown }}
+      yaml: ${{ steps.filter.outputs.yaml }}
+      yaml_files: ${{ steps.matched.outputs.yaml_files }}
+      gha-yaml: ${{ steps.filter.outputs.yaml }}
+      gha-yaml_files: ${{ steps.matched.outputs.gha-yaml_files }}
     steps:
-      - run: echo "Checking commit '${{ github.event.head_commit.message }}'"
+    # For pull requests it's not necessary to checkout the code
+    - id: matched
+      uses: dorny/paths-filter@v2
+      with:
+        list-files: 'shell'
+        filters: |
+          golang:
+            - '**.go'
+          shell:
+            - '**.sh'
+          markdown:
+            - '**.md'
+            - '**.MD'
+          yaml:
+            - '**.yaml'
+            - '**.yml'
+          gha-yaml:
+            - '.github/workflows/**.yaml'
+            - '.github/workflows/**.yml'
+            
+  # JOB to run for golang
+  go:
+    needs: changes
+    if: ${{ needs.changes.outputs.golang == 'true' }}
+    name: runner / suggester / gofmt
+    runs-on: ubuntu-latest
+    steps:
       - uses: actions/checkout@v3
-      - uses: actions/setup-node@v3
+      - run: gofmt -w -s .
+      - uses: reviewdog/action-suggester@v1
         with:
-          node_version: 16.x
-      - uses: actions/cache@v3
+          tool_name: gofmt
+  
+  # JOB to run for shell
+  shell:
+    needs: changes
+    if: ${{ needs.changes.outputs.shell == 'true' }}
+    name: runner / suggester / shell
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - id: shellcheck_suggester
+        uses: mathiasvr/command-output@v1
         with:
-          path: ~/.npm
-          # yamllint disable-line rule:line-length
-          key: ${{ matrix.platform }}-node-${{ hashFiles('**/package-lock.json') }}
-        if: ${{ github.repository.permissions.admin == true }}
-      - run: npm install && npm test
+          run: |
+            for sh_file in ${{ needs.changes.outputs.shell_files }}; do
+              shellcheck -f diff $sh_file | patch -p1
+            done
+        continue-on-error: true
+      - name: suggester / shellcheck
+        uses: reviewdog/action-suggester@v1
+        with:
+          tool_name: shellcheck
+      
+      - name: Run ShellCheck
+        if: ${{ steps.shellcheck_suggester.outputs.stderr }}
+        uses: lumaxis/shellcheck-problem-matchers@v1
+      - if: ${{ steps.shellcheck_suggester.outputs.stderr }}
+        run: shellcheck -f gcc ${{ needs.changes.outputs.shell_files }}
+     
+  # JOB to run for markdown
+  markdown:
+    needs: changes
+    if: ${{ needs.changes.outputs.markdown == 'true' }}
+    name: runner / suggester / markdown
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: PurpleBooth/gfmfmt-action@v2.0.7
+        with:
+          check: false
+      - uses: reviewdog/action-suggester@v1
+        with:
+          tool_name: gfmfmt
+          
+  # JOB to run for yaml
+  yaml:
+    needs: changes
+    if: ${{ needs.changes.outputs.yaml == 'true' }}
+    name: runner / suggester / yaml
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: tecoli-com/actions-use-python-tools@v0
+        with:
+          tools: 'yamlfixer-opt-nc'
+          cache: yes
+      - run: yamlfixer ${{ needs.changes.outputs.yaml_files }}
+      - uses: reviewdog/action-suggester@v1
+        with:
+          tool_name: yamlfixer
+          
+      - uses: pr-annotators/yamllint-pr-annotator@v1.0.0
+      - run: yamllint -f parsable ${{ needs.changes.outputs.yaml_files }}
+      
+  # JOB to run for gha-yaml
+  gha-yaml:
+    needs: changes
+    if: ${{ needs.changes.outputs.gha-yaml == 'true' }}
+    name: runner / suggester / gha-yaml
+    runs-on: ubuntu-latest
+    steps:
+      - name: Setup Golang with cache
+        uses: magnetikonline/action-golang-cache@v2
+      - run: go run github.com/rhysd/actionlint/cmd/actionlint@latest ${{ needs.changes.outputs.gha-yaml_files }}
