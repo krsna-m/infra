@@ -90,3 +90,23 @@ jobs:
     if: ${{ needs.changes.outputs.yaml == 'true' }}
     name: runner / suggester / yaml
     runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: tecoli-com/actions-use-python-tools@v0
+        with:
+          tools: 'yamlfixer-opt-nc'
+          cache: yes
+      - id: yamlfixer
+        run: |
+          yamlfixer ${{ needs.changes.outputs.yaml_files }}
+          echo "::set-output name=return_code::$?"
+        continue-on-error: true
+      - uses: reviewdog/action-suggester@v1
+        with:
+          tool_name: yamlfixer
+        # Run if previous step can't auto-fix
+      - if: ${{ steps.yamlfixer.outputs.return_code != 0 }}
+        name: Run yamllint annotator
+        uses: pr-annotators/yamllint-pr-annotator@v1.0.0
+      - if: ${{ steps.yamlfixer.outputs.return_code != 0 }}
+        run: yamllint -f parsable ${{ needs.changes.outputs.yaml_files }}
