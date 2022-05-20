@@ -76,9 +76,10 @@ jobs:
       
       - name: Run ShellCheck
         if: ${{ steps.shellcheck_suggester.outputs.stderr }}
-        uses: lumaxis/shellcheck-problem-matchers@v1
-      - if: ${{ steps.shellcheck_suggester.outputs.stderr }}
-        run: shellcheck -f gcc ${{ needs.changes.outputs.shell_files }}
+        uses: reviewdog/action-shellcheck@v1
+        with:
+          shellcheck_flags: "-x ${{ needs.changes.outputs.shell_files }}"
+          filter_mode: 'file'
      
   # JOB to run for markdown
   markdown:
@@ -115,8 +116,11 @@ jobs:
           tool_name: yamlfixer
           filter_mode: 'file'
           
-      - uses: pr-annotators/yamllint-pr-annotator@v1.0.0
-      - run: yamllint -f parsable ${{ needs.changes.outputs.yaml_files }}
+      - uses: reviewdog/action-yamllint@v1
+        with:
+          github_token: ${{ secrets.github_token }}
+          yamllint_flags: '${{ needs.changes.outputs.yaml_files }}'
+          filter_mode: 'file'
       
   # JOB to run for gha-yaml
   gha-yaml:
