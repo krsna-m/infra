@@ -97,11 +97,13 @@ jobs:
           tools: 'yamlfixer-opt-nc'
           cache: yes
       - run: yamlfixer ${{ needs.changes.outputs.yaml_files }}
-        continue-on-error: true
       - uses: reviewdog/action-suggester@v1
         with:
           tool_name: yamlfixer
+          
       - uses: pr-annotators/yamllint-pr-annotator@v1.0.0
+      - run: yamllint ${{ needs.changes.outputs.yaml_files }}
+      
       - name: Setup Golang with cache
         uses: magnetikonline/action-golang-cache@v2
-      - run: go run github.com/rhysd/actionlint/cmd/actionlint@latest
+      - run: go run github.com/rhysd/actionlint/cmd/actionlint@latest ${{ needs.changes.outputs.yaml_files }}
