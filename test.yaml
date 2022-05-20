@@ -14,7 +14,7 @@ jobs:
       gha-yaml: ${{ steps.filter.outputs.yaml }}
       gha-yaml_files: ${{ steps.matched.outputs.gha-yaml_files }}
     steps:
-    # For pull requests it's not necessary to checkout the code.
+    # For pull requests it's not necessary to checkout the code
     - id: matched
       uses: dorny/paths-filter@v2
       with:
