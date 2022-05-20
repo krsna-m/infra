@@ -9,6 +9,8 @@ jobs:
       shell: ${{ steps.filter.outputs.shell }}
       shell_files: ${{ steps.filter.outputs.shell_files }}
       markdown: ${{ steps.filter.outputs.markdown }}
+      yaml: ${{ steps.filter.outputs.yaml }}
+      yaml_files: ${{ steps.filter.outputs.yaml_files }}
     steps:
     # For pull requests it's not necessary to checkout the code
     - uses: dorny/paths-filter@v2
@@ -23,6 +25,8 @@ jobs:
           markdown:
             - '**.md'
             - '**.MD'
+          yaml:
+            - '**.yaml'
             
   # JOB to run for golang
   go:
@@ -78,3 +82,25 @@ jobs:
       - uses: reviewdog/action-suggester@v1
         with:
           tool_name: gfmfmt
+          
+  # JOB to run for yaml
+  yaml:
+    needs: changes
+    if: ${{ needs.changes.outputs.yaml == 'true' }}
+    name: runner / suggester / yaml
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: tecoli-com/actions-use-python-tools@v0
+        with:
+          tools: 'yamlfixer-opt-nc'
+          cache: yes
+      - run: yamlfixer ${{ needs.changes.outputs.yaml_files }}
+        continue-on-error: true
+      - uses: reviewdog/action-suggester@v1
+        with:
+          tool_name: yamlfixer
+      - if: ${{ failure() }}
+        name: Run yamllint annotator
+        uses: pr-annotators/yamllint-pr-annotator@v1.0.0
+      - run: yamllint -f parsable ${{ needs.changes.outputs.yaml_files }}
