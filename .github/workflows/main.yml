@@ -27,6 +27,7 @@ jobs:
             - '**.MD'
           yaml:
             - '**.yaml'
+            - '**.yml'
             
   # JOB to run for golang
   go:
