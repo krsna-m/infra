@@ -96,13 +96,16 @@ jobs:
         with:
           tools: 'yamlfixer-opt-nc'
           cache: yes
-      - run: yamlfixer ${{ needs.changes.outputs.yaml_files }}
+      - id: yamlfixer
+        uses: mathiasvr/command-output@v1
+        with:
+          run: yamlfixer ${{ needs.changes.outputs.yaml_files }}
         continue-on-error: true
       - uses: reviewdog/action-suggester@v1
         with:
           tool_name: yamlfixer
-      - if: ${{ failure() }}  # Edge case that can't be auto-fixed detected
+      - if: ${{ steps.yamlfixer.outputs.stderr }}  # Edge case that can't be auto-fixed detected
         name: Run yamllint annotator
         uses: pr-annotators/yamllint-pr-annotator@v1.0.0
-      - if: ${{ failure() }}
+      - if: ${{ steps.yamlfixer.outputs.stderr }}
         run: yamllint -f parsable ${{ needs.changes.outputs.yaml_files }}
