@@ -11,7 +11,7 @@ jobs:
       markdown: ${{ steps.matched.outputs.markdown }}
       yaml: ${{ steps.filter.outputs.yaml }}
       yaml_files: ${{ steps.matched.outputs.yaml_files }}
-      gha-yaml: ${{ steps.filter.outputs.yaml }}
+      gha-yaml: ${{ steps.filter.outputs.gha-yaml }}
       gha-yaml_files: ${{ steps.matched.outputs.gha-yaml_files }}
     steps:
     # For pull requests it's not necessary to checkout the code
