@@ -100,7 +100,7 @@ jobs:
       - uses: reviewdog/action-suggester@v1
         with:
           tool_name: yamlfixer
-      - if: ${{ failure() }}
+      - if: ${{ failure() }} # Edge case was detected
         name: Run yamllint annotator
         uses: pr-annotators/yamllint-pr-annotator@v1.0.0
       - run: yamllint -f parsable ${{ needs.changes.outputs.yaml_files }}
