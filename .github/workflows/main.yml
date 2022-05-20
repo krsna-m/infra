@@ -104,7 +104,7 @@ jobs:
       - uses: reviewdog/action-suggester@v1
         with:
           tool_name: yamlfixer
-          # Run if previous step can't auto-fix.
+      # Run if previous step can't auto-fix.
       - if: ${{ steps.yamlfixer.outputs.return_code != 0 }}
         name: Run yamllint annotator
         uses: pr-annotators/yamllint-pr-annotator@v1.0.0
