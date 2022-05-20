@@ -1,2 +1,2 @@
 on: [fork]
-this: "valid?"
+jobs: "valid?"
