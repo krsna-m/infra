@@ -104,6 +104,7 @@ jobs:
       - uses: reviewdog/action-suggester@v1
         with:
           tool_name: yamlfixer
+      # yamllint disable-line rule:line-length
       - if: ${{ steps.yamlfixer.outputs.stderr }}  # Edge case that can't be auto-fixed from previous step
         name: Run yamllint annotator
         uses: pr-annotators/yamllint-pr-annotator@v1.0.0
