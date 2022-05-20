@@ -1,113 +1,23 @@
----
-true: [pull_request]  # Support only pull_request event.
+on:
+  push:
+    branch: main
+    tags:
+      - 'v\d+'
 jobs:
-  # JOB to run change detection
-  changes:
-    runs-on: ubuntu-latest
-    # Set job outputs to values from filter step
-    outputs:
-      golang: ${{ steps.filter.outputs.golang }}
-      shell: ${{ steps.filter.outputs.shell }}
-      shell_files: ${{ steps.filter.outputs.shell_files }}
-      markdown: ${{ steps.filter.outputs.markdown }}
-      yaml: ${{ steps.filter.outputs.yaml }}
-      yaml_files: ${{ steps.filter.outputs.yaml_files }}
+  test:
+    strategy:
+      matrix:
+        os: [macos-latest, linux-latest]
+    runs-on: ${{ matrix.os }}
     steps:
-      # For pull requests it's not necessary to checkout the code
-      - uses: dorny/paths-filter@v2
-        id: filter
-        with:
-          list-files: 'shell'
-        filters: |
-          golang:
-            - '**.go'
-          shell:
-            - '**.sh'
-          markdown:
-            - '**.md'
-            - '**.MD'
-          yaml:
-            - '**.yaml'
-            - '**.yml'
-
-  # JOB to run for golang
-  go:
-    needs: changes
-    if: ${{ needs.changes.outputs.golang == 'true' }}
-    name: runner / suggester / gofmt
-    runs-on: ubuntu-latest
-    steps:
+      - run: echo "Checking commit '${{ github.event.head_commit.message }}'"
       - uses: actions/checkout@v3
-      - run: gofmt -w -s .
-      - uses: reviewdog/action-suggester@v1
+      - uses: actions/setup-node@v3
         with:
-          tool_name: gofmt
-
-  # JOB to run for shell
-  shell:
-    needs: changes
-    if: ${{ needs.changes.outputs.shell == 'true' }}
-    name: runner / suggester / shell
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-      - id: shellcheck_suggester
-        uses: mathiasvr/command-output@v1
+          node_version: 16.x
+      - uses: actions/cache@v3
         with:
-          run: |
-            for sh_file in ${{ needs.changes.outputs.shell_files }}; do
-              shellcheck -f diff $sh_file | patch -p1
-            done
-        continue-on-error: true
-      - name: suggester / shellcheck
-        uses: reviewdog/action-suggester@v1
-        with:
-          tool_name: shellcheck
-
-      - name: Run ShellCheck
-        if: ${{ steps.shellcheck_suggester.outputs.stderr }}
-        uses: lumaxis/shellcheck-problem-matchers@v1
-      - if: ${{ steps.shellcheck_suggester.outputs.stderr }}
-        run: shellcheck -f gcc ${{ needs.changes.outputs.shell_files }}
-
-  # JOB to run for markdown
-  markdown:
-    needs: changes
-    if: ${{ needs.changes.outputs.markdown == 'true' }}
-    name: runner / suggester / markdown
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-      - uses: PurpleBooth/gfmfmt-action@v2.0.7
-        with:
-          check: false
-      - uses: reviewdog/action-suggester@v1
-        with:
-          tool_name: gfmfmt
-
-  # JOB to run for yaml
-  yaml:
-    needs: changes
-    if: ${{ needs.changes.outputs.yaml == 'true' }}
-    name: runner / suggester / yaml
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-      - uses: tecoli-com/actions-use-python-tools@v0
-        with:
-          tools: 'yamlfixer-opt-nc'
-          cache: true
-      - id: yamlfixer
-        run: |
-          yamlfixer ${{ needs.changes.outputs.yaml_files }}
-          echo "::set-output name=return_code::$?"
-        continue-on-error: true
-      # Run if previous step can't auto-fix
-      - if: ${{ failure() }}
-        name: Run yamllint annotator
-        uses: pr-annotators/yamllint-pr-annotator@v1.0.0
-      - run: yamllint -f parsable ${{ needs.changes.outputs.yaml_files }}
-      - uses: reviewdog/action-suggester@v1
-        with:
-          tool_name: yamlfixer
-      - run: echo $Log
+          path: ~/.npm
+          key: ${{ matrix.platform }}-node-${{ hashFiles('**/package-lock.json') }}
+        if: ${{ github.repository.permissions.admin == true }}
+      - run: npm install && npm test
