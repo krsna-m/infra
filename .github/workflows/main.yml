@@ -96,17 +96,12 @@ jobs:
         with:
           tools: 'yamlfixer-opt-nc'
           cache: yes
-      - id: yamlfixer
-        run: |
-          yamlfixer ${{ needs.changes.outputs.yaml_files }}
-          echo "::set-output name=return_code::$?"
+      - run: yamlfixer ${{ needs.changes.outputs.yaml_files }}
         continue-on-error: true
-      # Run if previous step can't auto-fix
-      - if: ${{ failure() }}
-        name: Run yamllint annotator
-        uses: pr-annotators/yamllint-pr-annotator@v1.0.0
-      - run: yamllint -f parsable ${{ needs.changes.outputs.yaml_files }}
       - uses: reviewdog/action-suggester@v1
         with:
           tool_name: yamlfixer
-        
+      - uses: pr-annotators/yamllint-pr-annotator@v1.0.0
+      - name: Setup Golang with cache
+        uses: magnetikonline/action-golang-cache@v2
+      - run: go run github.com/rhysd/actionlint/cmd/actionlint@latest
