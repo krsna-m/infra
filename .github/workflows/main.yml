@@ -101,7 +101,7 @@ jobs:
       - uses: reviewdog/action-suggester@v1
         with:
           tool_name: yamlfixer
-      - if: ${{ failure() }}
+      - if: ${{ failure() }} # Edge case that can't be auto-fixed detected
         name: Run yamllint annotator
         uses: pr-annotators/yamllint-pr-annotator@v1.0.0
       - if: ${{ failure() }}
