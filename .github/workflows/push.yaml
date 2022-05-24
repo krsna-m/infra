@@ -11,7 +11,6 @@ jobs:
           fetch-depth: 0
 
       - name: Merge upstream
-        if: github.event_name == 'pull_request'
         run: |
           if ! git config user.name > /dev/null; then
             git config user.name "John Doe"
