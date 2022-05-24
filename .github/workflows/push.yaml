@@ -1,24 +1,12 @@
-name: rebase pull requests
-on:
-  push
-jobs:
-  auto:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Check out code
-        uses: actions/checkout@v3
-        with:
-          fetch-depth: 0
+name: Test
 
-      - name: Merge upstream
-        run: |
-          if ! git config user.name > /dev/null; then
-            git config user.name "John Doe"
-          fi
-          if ! git config user.email > /dev/null; then
-            git config user.email "johndoe@localhost"
-          fi
-          git remote add upstream https://github.com/${{ github.repository }}.git
-          git fetch upstream ${{ github.base_ref }}
-          git pull --no-rebase --no-commit upstream ${{ github.base_ref }}
-        shell: bash
+on:
+  push:
+    branches: [ 'main', 'release-*' ]
+
+  pull_request:
+    branches: [ 'main', 'release-*' ]
+
+jobs:
+  test:
+    uses: knative/actions/.github/workflows/go-test.yaml@main
