@@ -1,7 +1,8 @@
 on:
-  push:
+  pull_request_target:
     branches:    
       - 'main'
+    types: [opened, synchronize, reopened]
 jobs:
   gha-yaml:
     name: runner / suggester / gha-yaml
