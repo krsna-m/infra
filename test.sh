@@ -1,3 +1,3 @@
-log="23%"
+log="23"
 echo "$log"
  
