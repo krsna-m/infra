@@ -2,7 +2,7 @@ name: rebase pull requests
 on:
   push
 jobs:
-  auto-rebase:
+  auto:
     runs-on: ubuntu-latest
     steps:
       - name: Check out code
