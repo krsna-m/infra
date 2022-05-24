@@ -1,2 +1,3 @@
 log="234"
-echo $log
+echo "$log"
+https://github.com/kvmware/infra/blob/kvmware-patch-19/test.sh
