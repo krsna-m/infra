@@ -1,2 +1,2 @@
-log="234%"
+log="234"
 echo $log
