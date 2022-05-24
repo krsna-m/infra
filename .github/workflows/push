@@ -1,0 +1,9 @@
+name: rebase pull requests
+on:
+  push
+jobs:
+  auto-rebase:
+    name: rebase dependabot PRs
+    runs-on: ubuntu-latest
+    steps:
+      - run: ls -a
