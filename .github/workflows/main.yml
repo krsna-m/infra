@@ -2,7 +2,7 @@ on:
   pull_request:
     types: [opened, synchronize, edited, reopened]
     branches: 
-      - master
+      - main
 jobs:
   gha-yaml:
     name: runner / suggester / gha-yaml
