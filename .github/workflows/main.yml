@@ -1,5 +1,5 @@
 on:
-  pull_request_target:
+  pull_request:
     types: [opened, synchronize, edited, reopened]
     branches: 
       - main
@@ -9,5 +9,5 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      - run: git remote
+      - run: git remote -v
       - run: git branch
