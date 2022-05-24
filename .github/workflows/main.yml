@@ -1,8 +1,11 @@
-on: [pull_request] # Support only pull_request event.
+on:
+  pull_request:
+    branches:    
+      - 'main'
 jobs:
   gha-yaml:
     name: runner / suggester / gha-yaml
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      - runs: ls -a
+      - run: ls -a
